@@ -23,7 +23,9 @@ class Predict
     # сделаю один одномерный массив сгрупированных сэмплов+реагент * количество повторений
     # expanded_combination_result_flatten
     # подсчитать максимальное кол-во заполненых ячеек
+    # "#{expanded_combination_result_flatten.tally}"
     pre_result = grouped_by_reagent(expanded_combination_result_flatten)
+    # "#{pre_result["<Pink>"]}"
     "#{fill_layout(pre_result)}"
   end
 
@@ -40,15 +42,14 @@ class Predict
     in_memo_number = 0
     pre_result.values.each_with_index do |items, index|
       v_index = 0
-      number = @num_of_replicates[index]
+      number = items.tally
       items.each do |value|
-        @layout[@count_of_plates-1][v_index][@layout[@count_of_plates-1][v_index].index(nil)] = value
-        p "size = #{@layout[@count_of_plates-1][v_index].compact.size}"
-        if  @layout[@count_of_plates-1][v_index].compact.size == number + in_memo_number
+        if  @layout[@count_of_plates-1][v_index].compact.size == number[value] + in_memo_number
           v_index += 1
         end
+        @layout[@count_of_plates-1][v_index][@layout[@count_of_plates-1][v_index].index(nil)] = value
+        p "size = #{@layout[@count_of_plates-1][v_index].compact.size}"
       end
-      in_memo_number +=number
     end
     @layout
   end
@@ -95,7 +96,7 @@ class Predict
 end
 
 prediction = Predict.new(96,
-                         [['Sample-1', 'Sample-2', 'Sample-3'], ['Sample-1', 'Sample-2', 'Sample-3']],
-                         [['<Pink>'], ['<Green>']],
+                         [['Sample-1', 'Sample-2', 'Sample-3'], ['Sample-1', 'Sample-2']],
+                         [['<Pink>', '<Yellow>'], ['<Green>']],
                            [3, 2])
 puts prediction.result_layout

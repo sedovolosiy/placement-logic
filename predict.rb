@@ -20,41 +20,35 @@ class Predict
 
   def result_layout
     validate_num_replicates!
-
     # сделаю один одномерный массив сгрупированных сэмплов+реагент * количество повторений
     # expanded_combination_result_flatten
     # подсчитать максимальное кол-во заполненых ячеек
-    # "#{@layout.size}"
     pre_result = grouped_by_reagent(expanded_combination_result_flatten)
-    # "#{grouped_by_reagent(expanded_combination_result_flatten)}"
-    # "#{pre_result}"
     "#{fill_layout(pre_result)}"
   end
 
   private
 
+  def alternative_layout(flatten_list = [])
+    @layout[0].map do |rows|
+      rows.map! { |_item| flatten_list.shift }
+    end
+    @layout
+  end
+
   def fill_layout(pre_result)
-    v_index = 0
-    h_index = 0
+    in_memo_number = 0
     pre_result.values.each_with_index do |items, index|
+      v_index = 0
       number = @num_of_replicates[index]
       items.each do |value|
-        begin
-          @layout[@count_of_plates-1][v_index][h_index%number] = value
-          puts "#{value} #{v_index} '-' #{h_index%number}"
-        rescue
-          # p @layout[@count_of_plates-1][v_index]
-          # p v_index
-          # p h_index
-        end
-        h_index += 1
-        if h_index%number == 0
+        @layout[@count_of_plates-1][v_index][@layout[@count_of_plates-1][v_index].index(nil)] = value
+        p "size = #{@layout[@count_of_plates-1][v_index].compact.size}"
+        if  @layout[@count_of_plates-1][v_index].compact.size == number + in_memo_number
           v_index += 1
-          # h_index = 0
         end
-        # p h_position
-        # p v_position
       end
+      in_memo_number +=number
     end
     @layout
   end

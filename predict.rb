@@ -27,9 +27,12 @@ class Predict
     # подсчитать максимальное кол-во заполненых ячеек
     # "#{expanded_combination_result_flatten.tally}"
     # ap expanded_combination_result_flatten, :multiline => false
-    # pre_result = grouped_by_reagent(expanded_combination_result_flatten)
+    pre_result = grouped_by_reagent(expanded_combination_result_flatten)
+    # visualize(pre_result.values)
     # "#{pre_result["<Green>"]}"
-    # visualize(fill_layout(pre_result))
+    # visualize(alternative_layout(expanded_combination_result_flatten))
+    count_of_cells
+    # visualize(alternative_layout(pre_result.values.flatten(1)))
   end
 
   private
@@ -112,5 +115,5 @@ end
 prediction = Predict.new(96,
                          [['Sample-1', 'Sample-2', 'Sample-3'], ['Sample-1', 'Sample-2']],
                          [['<Pink>', '<Yellow>', '<Green>'], ['<Green>']],
-                           [3, 2])
+                           [6, 21])
 puts prediction.result_layout

@@ -1,3 +1,5 @@
+require "awesome_print"
+
 class Predict
   attr_accessor :plate_size, :samples, :reagents,
                 :num_of_replicates, :layout, :count_of_plates,
@@ -24,9 +26,10 @@ class Predict
     # expanded_combination_result_flatten
     # подсчитать максимальное кол-во заполненых ячеек
     # "#{expanded_combination_result_flatten.tally}"
-    pre_result = grouped_by_reagent(expanded_combination_result_flatten)
-    # "#{pre_result["<Pink>"]}"
-    "#{fill_layout(pre_result)}"
+    # ap expanded_combination_result_flatten, :multiline => false
+    # pre_result = grouped_by_reagent(expanded_combination_result_flatten)
+    # "#{pre_result["<Green>"]}"
+    # visualize(fill_layout(pre_result))
   end
 
   private
@@ -42,13 +45,18 @@ class Predict
     in_memo_number = 0
     pre_result.values.each_with_index do |items, index|
       v_index = 0
+      #есть проблемма, если реагентов одного цвета больше чем количество ячеек в ряду
+      # как сделать пере
       number = items.tally
       items.each do |value|
-        if  @layout[@count_of_plates-1][v_index].compact.size == number[value] + in_memo_number
+        # if @layout[@count_of_plates-1][v_index].compact.size == 5
+        #   p "here #{items} and value #{value}"
+        # end
+        if  @layout[@count_of_plates-1][v_index].count('-') == 0 || @layout[@count_of_plates-1][v_index].reject { |elem| elem == '-' }.size >= number[value] + in_memo_number
           v_index += 1
         end
-        @layout[@count_of_plates-1][v_index][@layout[@count_of_plates-1][v_index].index(nil)] = value
-        p "size = #{@layout[@count_of_plates-1][v_index].compact.size}"
+        @layout[@count_of_plates-1][v_index][@layout[@count_of_plates-1][v_index].index('-')] = value
+        # p "size = #{@layout[@count_of_plates-1][v_index].compact.size} v_index=#{v_index}"
       end
     end
     @layout
@@ -63,7 +71,7 @@ class Predict
           end
         end
       end
-    end.flatten(3)
+    end.flatten(3).sort
   end
 
   def count_of_cells
@@ -80,7 +88,7 @@ class Predict
 
   def generate_empty_layout
     @count_of_plates.times.each_with_object([]) do |_idx, out|
-      out << Array.new(PLATE_SIZES[@plate_size][:rows]) { Array.new(PLATE_SIZES[@plate_size][:columns]) }
+      out << Array.new(PLATE_SIZES[@plate_size][:rows]) { Array.new(PLATE_SIZES[@plate_size][:columns], '-') }
     end
   end
 
@@ -93,10 +101,16 @@ class Predict
   def grouped_by_reagent(data)
     data.group_by { |item| item[1].itself }
   end
+  def visualize(array)
+    # f=->c,p=?>{c.map{|x|x==[*x]?f[x,?-+p]:p+x}*$/}
+    # f[array]
+    # array.first.product(*array.drop(1))
+    ap array, :multiline => true
+  end
 end
 
 prediction = Predict.new(96,
                          [['Sample-1', 'Sample-2', 'Sample-3'], ['Sample-1', 'Sample-2']],
-                         [['<Pink>', '<Yellow>'], ['<Green>']],
+                         [['<Pink>', '<Yellow>', '<Green>'], ['<Green>']],
                            [3, 2])
 puts prediction.result_layout

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Class for create layout of combinations
-class Predict
+class Placement
   PLATE_SIZES = {
     96 => { rows: 8, columns: 12 },
     384 => { rows: 16, columns: 24 }
@@ -17,7 +17,7 @@ class Predict
     @layout = generate_empty_layout
   end
 
-  def result_layout
+  def layout
     validate_num_replicates!
 
     pre_result = grouped_by_reagent(expanded_combination_result_flatten)
@@ -84,8 +84,8 @@ class Predict
   end
 end
 
-prediction = Predict.new(96,
-                         [%w[Sample-1 Sample-2 Sample-3], %w[Sample-1 Sample-2]],
-                         [['<Pink>', '<Yellow>', '<Green>'], ['<Green>']],
-                         [7, 21])
-p prediction.result_layout
+result = Placement.new(96,
+                           [%w[Sample-1 Sample-2 Sample-3], %w[Sample-1 Sample-2]],
+                           [['<Pink>', '<Yellow>', '<Green>'], ['<Green>']],
+                           [7, 21])
+p result.layout

@@ -31,15 +31,18 @@ class Predict
     # visualize(pre_result.values)
     # "#{pre_result["<Green>"]}"
     # visualize(alternative_layout(expanded_combination_result_flatten))
-    count_of_cells
-    # visualize(alternative_layout(pre_result.values.flatten(1)))
+    # count_of_cells
+    visualize(alternative_layout(pre_result.values.flatten(1)))
+    # visualize(@layout)
   end
 
   private
 
   def alternative_layout(flatten_list = [])
-    @layout[0].map do |rows|
-      rows.map! { |_item| flatten_list.shift }
+    @layout.each do |plate|
+      plate.map do |rows|
+        rows.map! { |_item| flatten_list.shift }
+      end
     end
     @layout
   end
@@ -115,5 +118,5 @@ end
 prediction = Predict.new(96,
                          [['Sample-1', 'Sample-2', 'Sample-3'], ['Sample-1', 'Sample-2']],
                          [['<Pink>', '<Yellow>', '<Green>'], ['<Green>']],
-                           [6, 21])
+                           [7, 21])
 puts prediction.result_layout

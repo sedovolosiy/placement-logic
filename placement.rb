@@ -1,7 +1,6 @@
-# frozen_string_literal: true
-
 # Class for create layout of combinations
 class Placement
+  attr_reader :result
   PLATE_SIZES = {
     96 => { rows: 8, columns: 12 },
     384 => { rows: 16, columns: 24 }
@@ -17,14 +16,36 @@ class Placement
     @layout = generate_empty_layout
   end
 
-  def layout
-    validate_num_replicates!
-
+  #save result to file render.html in root
+  def show_plates
     pre_result = grouped_by_reagent(expanded_combination_result_flatten)
-    fill_layout(pre_result.values.flatten(1))
+    @result = fill_layout(pre_result.values.flatten(1))
+
+    table = to_html_table(result)
+
+    # write table to file
+    File.open('./render.html', 'w') do |f|
+      f.write table
+    end
   end
 
   private
+
+  # create result as html table
+  def to_html_table(plates)
+    plates.map.with_index do |plate, plate_num|
+      '<table>' << "Plate #{plate_num + 1}" << '<tr>' <<
+        plate.map do |sample_groups|
+          '<td ' << sample_groups.map do |sample_group|
+            if sample_group.nil?
+              'style=background-color:gray> nil'
+            else
+              "style=background-color:#{sample_group[1].downcase}> #{sample_group}"
+            end
+          end.join('</td><td ') << '</td>'
+        end.join('</tr><tr>') << '</tr></table>'
+    end.join
+  end
 
   # calculate total count of cells for define count of plate
   def calc_cells
@@ -85,7 +106,11 @@ class Placement
 end
 
 result = Placement.new(96,
-                       [%w[Sample-1 Sample-2 Sample-3], %w[Sample-1 Sample-2]],
-                       [['<Pink>', '<Yellow>', '<Green>'], ['<Green>']],
-                       [6, 21])
-p result.layout
+                       [%w[Sample-1 Sample-2 Sample-3], %w[Sample-1 Sample-2 Sample-4], %w[Sample-4]],
+                       [%w[Pink Yellow Green], %w[Green Blue], ['Orange']],
+                       [15, 21, 7])
+#save preview to html file
+result.show_plates
+
+#show result as array
+p result.result

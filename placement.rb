@@ -26,15 +26,18 @@ class Placement
 
   private
 
-  # filling layout
-  def fill_layout(flatten_list = [])
-    @layout.each do |plate|
-      plate.map do |rows|
-        rows.map! { flatten_list.shift }
-        break if flatten_list.empty?
-      end
+  # calculate total count of cells for define count of plate
+  def calc_cells
+    count = 0
+    @samples.each_with_index do |sample, index|
+      count += sample.size * @reagents[index].size * @num_of_replicates[index]
     end
-    @layout
+    count
+  end
+
+  # total count of plates
+  def calc_plates
+    (@count_of_cells / @plate_size) + ((@count_of_cells % @plate_size).zero? ? 0 : 1)
   end
 
   # prepared flatted array for future group by reagent
@@ -50,18 +53,15 @@ class Placement
     end.flatten(3).sort
   end
 
-  # calculate total count of cells for define count of plate
-  def calc_cells
-    count = 0
-    @samples.each_with_index do |sample, index|
-      count += sample.size * @reagents[index].size * @num_of_replicates[index]
+  # filling layout
+  def fill_layout(flatten_list = [])
+    @layout.each do |plate|
+      plate.map do |rows|
+        rows.map! { flatten_list.shift }
+        break if flatten_list.empty?
+      end
     end
-    count
-  end
-
-  # total count of plates
-  def calc_plates
-    (@count_of_cells / @plate_size) + ((@count_of_cells % @plate_size).zero? ? 0 : 1)
+    @layout
   end
 
   # generating fixed size array for future data filling
@@ -71,16 +71,16 @@ class Placement
     end
   end
 
+  # group by reagents for next loop as groupped data
+  def grouped_by_reagent(data)
+    data.group_by { |item| item[1].itself }
+  end
+
   # simple validation
   def validate_num_replicates!
     return unless @samples.size != @num_of_replicates.size
 
     raise ArgumentError, 'Invalid parameters'
-  end
-
-  # group by reagents for next loop as groupped data
-  def grouped_by_reagent(data)
-    data.group_by { |item| item[1].itself }
   end
 end
 

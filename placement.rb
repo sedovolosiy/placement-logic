@@ -87,5 +87,5 @@ end
 result = Placement.new(96,
                        [%w[Sample-1 Sample-2 Sample-3], %w[Sample-1 Sample-2]],
                        [['<Pink>', '<Yellow>', '<Green>'], ['<Green>']],
-                       [7, 21])
+                       [6, 21])
 p result.layout

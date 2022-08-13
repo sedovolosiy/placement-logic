@@ -1,6 +1,7 @@
 # Class for create layout of combinations
 class Placement
   attr_reader :result
+
   PLATE_SIZES = {
     96 => { rows: 8, columns: 12 },
     384 => { rows: 16, columns: 24 }
